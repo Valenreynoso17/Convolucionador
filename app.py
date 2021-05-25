@@ -11,9 +11,6 @@ import matplotlib.pylab as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvas 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
-def convertirAListaNums(listaDeStrings):
-    return np.float_(list(listaDeStrings.split(" ")))
-
 class MyWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
@@ -22,13 +19,20 @@ class MyWindow(QtWidgets.QMainWindow):
     
     @pyqtSlot()
     def onClick(self):
-        # test data
-        nf = int(self.ui.lineEdit_nf.text())
-        imagenF = convertirAListaNums(self.ui.lineEdit_imagenF.text())
-        dominioF = np.arange(nf, len(imagenF) + nf, 1)
-        ng = int(self.lineEdit_ng.text())
-        imagenG = convertirAListaNums(self.lineEdit_imagenG.text())
-        dominioG = np.arange(ng, len(imagenG) + ng, 1)
+        # Obtener informacion
+        try:
+            nf = int(self.ui.lineEdit_nf.text())
+            imagenF = self.convertirAListaNums(self.ui.lineEdit_imagenF.text())
+            dominioF = np.arange(nf, len(imagenF) + nf, 1)
+        except ValueError:
+            nf = 0
+        
+        try:
+            ng = int(self.lineEdit_ng.text())
+            imagenG = self.convertirAListaNums(self.lineEdit_imagenG.text())
+            dominioG = np.arange(ng, len(imagenG) + ng, 1)
+        except ValueError:
+            ng = 0
 
         imagenConvolucion = np.convolve(imagenF,imagenG)
         anchoPulso = len(imagenF) + len(imagenG) - 1
@@ -67,6 +71,12 @@ class MyWindow(QtWidgets.QMainWindow):
         # add toolbar
         self.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(self.plotWidget, self))
             
+    def convertirAListaNums(self, listaDeStrings):
+        lista = listaDeStrings.strip().split()
+        if all(map(str.isnumeric, lista)):
+            return np.float_(lista)
+        else:
+            pass # TODO
 
 if __name__ == '__main__':
 
