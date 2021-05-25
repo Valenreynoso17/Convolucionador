@@ -57,6 +57,12 @@ class MyWindow(QtWidgets.QMainWindow):
         
         # plot
         self.plotWidget = FigureCanvas(fig)
+
+        # Borrando el plot anterior
+        for i in reversed(range(self.ui.gridLayout_2.count())): 
+            self.ui.gridLayout_2.itemAt(i).widget().setParent(None)
+
+        # Agregando el nuevo grafico
         self.ui.gridLayout_2.addWidget(self.plotWidget)
         # add toolbar
         self.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(self.plotWidget, self))
