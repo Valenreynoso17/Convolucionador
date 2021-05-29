@@ -8,8 +8,7 @@ import matplotlib
 matplotlib.use('QT5Agg')
 
 import matplotlib.pylab as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvas 
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt5agg import FigureCanvas
 
 class MyWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -22,17 +21,23 @@ class MyWindow(QtWidgets.QMainWindow):
         # Obtener informacion
         try:
             nf = int(self.ui.lineEdit_nf.text())
-            imagenF = self.convertirAListaNums(self.ui.lineEdit_imagenF.text())
-            dominioF = np.arange(nf, len(imagenF) + nf, 1)
         except ValueError:
             nf = 0
-        
+
         try:
             ng = int(self.lineEdit_ng.text())
+        except ValueError:
+            ng = 0
+        
+        try:
+            imagenF = self.convertirAListaNums(self.ui.lineEdit_imagenF.text())
+            dominioF = np.arange(nf, len(imagenF) + nf, 1)
             imagenG = self.convertirAListaNums(self.lineEdit_imagenG.text())
             dominioG = np.arange(ng, len(imagenG) + ng, 1)
         except ValueError:
-            ng = 0
+            QtWidgets.QMessageBox.critical(self, 'Error', 'Los valores de las funciones no pueden contener letras.')
+            return
+        
 
         imagenConvolucion = np.convolve(imagenF,imagenG)
         anchoPulso = len(imagenF) + len(imagenG) - 1
@@ -58,6 +63,8 @@ class MyWindow(QtWidgets.QMainWindow):
         ax2.legend()
         ax2.axhline(y=0, color='k')
         ax2.axvline(x=0, color='k')
+
+        plt.tight_layout()
         
         # plot
         self.plotWidget = FigureCanvas(fig)
@@ -68,15 +75,9 @@ class MyWindow(QtWidgets.QMainWindow):
 
         # Agregando el nuevo grafico
         self.ui.gridLayout_2.addWidget(self.plotWidget)
-        # add toolbar
-        self.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(self.plotWidget, self))
             
     def convertirAListaNums(self, listaDeStrings):
-        lista = listaDeStrings.strip().split()
-        if all(map(str.isnumeric, lista)):
-            return np.float_(lista)
-        else:
-            pass # TODO
+        return np.float_(listaDeStrings.split())
 
 if __name__ == '__main__':
 
